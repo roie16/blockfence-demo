@@ -50,7 +50,7 @@ public class EthCodeUseCaseRouter {
                             operation = @Operation(operationId = "generateContractCodeForAddress", responses = {
                                     @ApiResponse(responseCode = "200", description = "successful operation",
                                             content = @Content(schema = @Schema(implementation = ContractsCodes.class))),
-                                    @ApiResponse(responseCode = "400", description = "Invalid address")}, parameters = {
+                                    @ApiResponse(responseCode = "400", description = "Invalid Eth address")}, parameters = {
                                     @Parameter(in = QUERY, name = "address")})
                     ),
                     @RouterOperation(path = V1 + ETH + VERSION
