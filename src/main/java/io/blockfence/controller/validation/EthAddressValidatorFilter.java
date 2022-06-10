@@ -6,11 +6,11 @@ import org.springframework.web.reactive.function.server.HandlerFilterFunction;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.web3j.crypto.WalletUtils;
 import reactor.core.publisher.Mono;
 
 import static java.util.Map.of;
 import static org.springframework.web.reactive.function.server.ServerResponse.badRequest;
-import static org.web3j.crypto.WalletUtils.isValidAddress;
 
 @Component
 public class EthAddressValidatorFilter implements HandlerFilterFunction<ServerResponse, ServerResponse> {
@@ -19,9 +19,8 @@ public class EthAddressValidatorFilter implements HandlerFilterFunction<ServerRe
     @Override
     public Mono<ServerResponse> filter(ServerRequest request, @NotNull HandlerFunction<ServerResponse> handlerFunction) {
         return request.queryParam("address")
-                .map(address -> isValidAddress(address) ?
-                        handlerFunction.handle(request) :
-                        badRequest().bodyValue(of("error", "Invalid Eth address")))
-                .orElseThrow();
+                .filter(WalletUtils::isValidAddress)
+                .map(address -> handlerFunction.handle(request))
+                .orElseGet(() -> badRequest().bodyValue(of("error", "Invalid Eth address")));
     }
 }
