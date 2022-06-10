@@ -36,13 +36,7 @@ public class EthCodeUseCaseHandler {
         return fromCallable(() -> web3j.ethGetCode(address, DefaultBlockParameterName.LATEST).send())
                 .map(ethGetCode -> new ContractsCodes(ethGetCode.getCode()))
                 .subscribeOn(boundedElastic());
-//        String opcode = "";
-//        try (V8Runtime v8Runtime = V8Host.getNodeInstance().createV8Runtime();
-//             InputStream inputStream = parser.getInputStream()) {
-//            String script = new String(inputStream.readAllBytes(), UTF_8);
-//            script = "const bytecode = " + ethGetCode.getCode() + script;
-//            opcode = v8Runtime.getExecutor(script).executeString();
-//        }
+
     }
 
     @SneakyThrows
