@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ContractsCodes {
     private String byteCode;
+    private ContractOpcodes contractOpcodes;
 }
