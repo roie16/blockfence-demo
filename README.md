@@ -12,8 +12,16 @@
 
 ## swagger endpoint:
 you can test the api using the following link(instead of postman):
-  * http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui.html
 
 ## run:
    run the Attached dockerfile (publish port 8080)
+
+
+# Deployment
+
+## Heroku url
+swagger: 
+https://blockfence-demo.herokuapp.com/swagger-ui.html
+
 
