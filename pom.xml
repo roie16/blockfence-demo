@@ -21,6 +21,7 @@
         <java.version>17</java.version>
         <springdoc.version>1.6.9</springdoc.version>
         <web3j.core.version>4.9.2</web3j.core.version>
+        <yavi.version>0.11.3</yavi.version>
     </properties>
 
     <dependencies>
@@ -47,6 +48,12 @@
             <groupId>org.web3j</groupId>
             <artifactId>core</artifactId>
             <version>${web3j.core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>am.ik.yavi</groupId>
+            <artifactId>yavi</artifactId>
+            <version>${yavi.version}</version>
         </dependency>
 
         <dependency>

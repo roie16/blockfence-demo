@@ -3,11 +3,10 @@ blockfence:
     mainnet:
       url: https://mainnet.infura.io/v3/49f307eb05f14fbc8d13fd3355562a6f
 
-
----
-spring:
-  config:
-    activate:
-      on-profile: heroku
-server:
-  port: ${PORT}
+#---
+#spring:
+#  config:
+#    activate:
+#      on-profile: heroku
+#server:
+#  port: ${PORT}
