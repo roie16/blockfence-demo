@@ -49,7 +49,7 @@ public class EthCodeHandler {
                         .map(ethCodeUseCaseService::getContractsCodesMono)
                         .mapErrors(violations -> of(violations).details())
                         .fold(this::buildErrorResponse, contractsCodes -> ok().body(contractsCodes, ContractsCodes.class)))
-                .orElseGet(() -> badRequest().bodyValue(new AddressesError("Eth addresses parameter not found", List.of())));
+                .orElseGet(() -> badRequest().bodyValue(new AddressesError("address query parameter not found", List.of())));
     }
 
     @NotNull
