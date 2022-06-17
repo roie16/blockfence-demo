@@ -20,8 +20,4 @@ public class StringTwoCharIterator implements Iterator<String> {
         pos = pos + 2;
         return substring;
     }
-
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
 }

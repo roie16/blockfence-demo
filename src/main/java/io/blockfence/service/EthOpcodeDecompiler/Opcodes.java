@@ -2,8 +2,10 @@ package io.blockfence.service.EthOpcodeDecompiler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Arrays.stream;
+import static java.util.Optional.ofNullable;
 
 public enum Opcodes {
 
@@ -162,8 +164,8 @@ public enum Opcodes {
         this.parametersNum = paramsNum;
     }
 
-    public static Opcodes getOpcode(Integer hex) {
-        return opcodes.get(hex);
+    public static Optional<Opcodes> getOpcode(Integer hex) {
+        return ofNullable(opcodes.get(hex));
     }
 
     public int getParametersNum() {

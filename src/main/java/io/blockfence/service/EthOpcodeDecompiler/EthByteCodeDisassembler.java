@@ -2,21 +2,25 @@ package io.blockfence.service.EthOpcodeDecompiler;
 
 import io.blockfence.data.ContractOpcodes;
 import io.blockfence.service.EthOpcodeDecompiler.iterators.StringTwoCharIterator;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.blockfence.service.EthOpcodeDecompiler.Opcodes.UNKNOWN;
 import static io.blockfence.service.EthOpcodeDecompiler.Opcodes.getOpcode;
 import static io.netty.util.internal.StringUtil.EMPTY_STRING;
 import static java.lang.Integer.valueOf;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Stream.iterate;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 @Component
-@Log4j2
+@Slf4j
 public class EthByteCodeDisassembler {
 
     private static final String CONTRACT_METADATA_PREFIX = "a165627a7a72305820"; // 0xa1 0x65 'b' 'z' 'z' 'r' '0' 0x58 0x20 + <32 bytes swarm hash> <2 bytes length of the metadata>
@@ -43,44 +47,61 @@ public class EthByteCodeDisassembler {
     private List<String> loadOpcodes(String contractByteCode) {
         StringTwoCharIterator iterator = new StringTwoCharIterator(contractByteCode);
         List<String> disassembledCodes = new ArrayList<>();
-        int offset = 0;
-        while (iterator.hasNext()) {
-            String nextByte = iterator.next();
-            Opcode opcode = new Opcode();
-            opcode.setOffset(offset);
-            Integer opcodeHex = valueOf(nextByte, RADIX);
-            Opcodes opcodeDefinition = getOpcode(opcodeHex);
-            if (opcodeDefinition == null) {
-                //log.warn("Unknown opcode: " + opcodeHex);
-                opcode.setOpcode(UNKNOWN);
-            } else {
-                opcode.setOpcode(opcodeDefinition);
-                int parametersNum = opcodeDefinition.getParametersNum();
-                if (parametersNum > 0) {
-                    offset = offset + parametersNum;
-                    String opParameter = getParameter(parametersNum, iterator);
-                    String parameterString = opParameter.replaceAll(PREFIX, EMPTY_STRING);
-                    if (isEmpty(parameterString)) {
-                        opcode.setOpcode(UNKNOWN);
-                    } else {
-                        opcode.setParameter(new BigInteger(parameterString, RADIX));
-                    }
-                }
-            }
-            offset = offset + 1;
-            disassembledCodes.add(opcode.toString());
-        }
+        AtomicInteger index = new AtomicInteger(0);
+        iterate(iterator, Iterator::hasNext, identity())
+                .map(StringTwoCharIterator::next)
+                .forEach(nextBytes -> index.set(handleNextByes(index, nextBytes, disassembledCodes, iterator)));
         return disassembledCodes;
     }
 
-    private static String getParameter(int parametersNum, StringTwoCharIterator iterator) {
-        StringBuilder sb = new StringBuilder(PREFIX);
-        int i = 0;
-        while (i < parametersNum && iterator.hasNext()) {
-            String next = iterator.next();
-            sb.append(next);
-            i = i + 1;
+    private int handleNextByes(AtomicInteger index, String nextByte, List<String> disassembledCodes, StringTwoCharIterator iterator) {
+        Opcode opcode = new Opcode();
+        opcode.setOffset(index.get());
+        Integer opcodeHex = valueOf(nextByte, RADIX);
+        getOpcode(opcodeHex).ifPresentOrElse(opcodes -> doOnOpcode(index, iterator, opcode, opcodes), () -> doOnEmptyOpcode(opcode, opcodeHex));
+        disassembledCodes.add(opcode.toString());
+        return index.incrementAndGet();
+    }
+
+    private void doOnOpcode(AtomicInteger index, StringTwoCharIterator iterator, Opcode opcode, Opcodes opcodes) {
+        opcode.setOpcode(opcodes);
+        int parametersNum = opcodes.getParametersNum();
+        if (parametersNum > 0) {
+            index.addAndGet(parametersNum);
+            String opParameter = getParameter(parametersNum, iterator);
+            String parameterString = opParameter.replaceAll(PREFIX, EMPTY_STRING);
+            addParameterIfNotEmpty(opcode, parameterString);
         }
-        return sb.toString();
+    }
+
+    private void doOnEmptyOpcode(Opcode opcode, Integer opcodeHex) {
+        log.warn("Unknown opcode: " + opcodeHex);
+        opcode.setOpcode(UNKNOWN);
+    }
+
+    private void addParameterIfNotEmpty(Opcode opcode, String parameterString) {
+        if (isEmpty(parameterString)) {
+            opcode.setOpcode(UNKNOWN);
+        } else {
+            opcode.setParameter(new BigInteger(parameterString, RADIX));
+        }
+    }
+
+    private String getParameter(int parametersNum, StringTwoCharIterator iterator) {
+        StringBuilder stringBuilder = new StringBuilder(PREFIX);
+        AtomicInteger index = new AtomicInteger(0);
+        iterate(iterator, stringTwoCharIterator -> isParameter(parametersNum, index, stringTwoCharIterator), identity())
+                .map(StringTwoCharIterator::next)
+                .forEach(nextString -> appendToParameterString(stringBuilder, index, nextString));
+        return stringBuilder.toString();
+    }
+
+    private void appendToParameterString(StringBuilder stringBuilder, AtomicInteger index, String nextString) {
+        stringBuilder.append(nextString);
+        index.incrementAndGet();
+    }
+
+    private boolean isParameter(int parametersNum, AtomicInteger index, StringTwoCharIterator stringTwoCharIterator) {
+        return stringTwoCharIterator.hasNext() && index.get() < parametersNum;
     }
 }

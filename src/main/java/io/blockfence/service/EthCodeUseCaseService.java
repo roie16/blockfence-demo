@@ -1,6 +1,7 @@
 package io.blockfence.service;
 
 import io.blockfence.data.AddressesDTO;
+import io.blockfence.data.ContractOpcodes;
 import io.blockfence.data.ContractsCodes;
 import io.blockfence.service.EthOpcodeDecompiler.EthByteCodeDisassembler;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,8 @@ public class EthCodeUseCaseService {
     private ContractsCodes getEthGetCodeByAddress(String address) {
         try {
             EthGetCode ethGetCode = web3j.ethGetCode(address, DefaultBlockParameterName.LATEST).send();
-            return new ContractsCodes(ethGetCode.getCode(), ethByteCodeDisassembler.buildContractOpcodesFromByteCode(ethGetCode.getCode()));
+            ContractOpcodes contractOpcodes = ethByteCodeDisassembler.buildContractOpcodesFromByteCode(ethGetCode.getCode());
+            return new ContractsCodes(ethGetCode.getCode(), contractOpcodes);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
