@@ -11,7 +11,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.fromCallable;
@@ -35,20 +34,14 @@ public class EthCodeUseCaseService {
                 .subscribeOn(boundedElastic());
     }
 
-    public Mono<ContractsCodes> generateContractCodeForAddress(Optional<String> address) {
-        return address
-                .map(this::getContractsCodesMono)
-                .orElseThrow();
+    public Mono<ContractsCodes> getContractsCodesMono(String address) {
+        return fromCallable(() -> getEthGetCodeByAddress(address))
+                .subscribeOn(boundedElastic());
     }
 
     public Mono<String> getClientVersion() {
         return fromCallable(() -> web3j.web3ClientVersion().send())
                 .map(web3ClientVersion -> "Client version" + web3ClientVersion)
-                .subscribeOn(boundedElastic());
-    }
-
-    private Mono<ContractsCodes> getContractsCodesMono(String address) {
-        return fromCallable(() -> getEthGetCodeByAddress(address))
                 .subscribeOn(boundedElastic());
     }
 

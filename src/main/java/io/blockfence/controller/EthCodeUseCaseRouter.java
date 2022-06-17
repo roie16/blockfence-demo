@@ -1,11 +1,9 @@
 package io.blockfence.controller;
 
-import io.blockfence.controller.validation.EthAddressHeaderValidatorFilter;
 import io.blockfence.data.AddressesDTO;
 import io.blockfence.data.AddressesError;
 import io.blockfence.data.ContractsCodes;
 import io.blockfence.handler.EthCodeHandler;
-import io.blockfence.service.EthCodeUseCaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -38,12 +36,9 @@ public class EthCodeUseCaseRouter {
     private static final String CONTRACT_RAW_DATA = "/contractrawdata";
     private static final String ETH = "/eth";
 
-    private final EthAddressHeaderValidatorFilter ethAddressHeaderValidatorFilter;
     private final EthCodeHandler ethCodeHandler;
 
-    public EthCodeUseCaseRouter(EthAddressHeaderValidatorFilter ethAddressHeaderValidatorFilter, EthCodeHandler ethCodeHandler) {
-
-        this.ethAddressHeaderValidatorFilter = ethAddressHeaderValidatorFilter;
+    public EthCodeUseCaseRouter(EthCodeHandler ethCodeHandler) {
         this.ethCodeHandler = ethCodeHandler;
     }
 
@@ -68,16 +63,15 @@ public class EthCodeUseCaseRouter {
                                             content = @Content(schema = @Schema(implementation = AddressesError.class)))},
                             parameters = {@Parameter(in = QUERY, name = "address")})),
             @RouterOperation(path = V1 + ETH + VERSION,
-                    produces = APPLICATION_JSON_VALUE, method = GET, beanClass = EthCodeUseCaseService.class, beanMethod = "getClientVersion",
-                    operation = @Operation(operationId = "getClientVersion",
-                            responses = {
-                                    @ApiResponse(responseCode = "200", description = "successful operation",
-                                            content = @Content(schema = @Schema(implementation = String.class)))})
+                    produces = APPLICATION_JSON_VALUE, method = GET, operation = @Operation(operationId = "getClientVersion",
+                    responses = {
+                            @ApiResponse(responseCode = "200", description = "successful operation",
+                                    content = @Content(schema = @Schema(implementation = String.class)))})
             )})
     @Bean
     public RouterFunction<ServerResponse> EthCodeUseCaseRoutes() {
         return nest(path(V1 + ETH),
-                route(GET(CONTRACT_RAW_DATA), ethCodeHandler::getEthDataByAddress).filter(ethAddressHeaderValidatorFilter)
+                route(GET(CONTRACT_RAW_DATA), ethCodeHandler::getEthDataByAddress)
                         .andRoute(GET(VERSION), ethCodeHandler::getClientVersion)
                         .andRoute(POST(CONTRACT_RAW_DATA), ethCodeHandler::getMultipleDataByAddressListBody));
     }

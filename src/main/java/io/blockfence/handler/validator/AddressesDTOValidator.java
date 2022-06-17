@@ -25,4 +25,8 @@ public class AddressesDTOValidator {
     public Validator<AddressesDTO> getAddressesDTOValidator() {
         return addressesDTOValidator;
     }
+
+    public Validator<String> getAddressValidator() {
+        return addressValidator;
+    }
 }

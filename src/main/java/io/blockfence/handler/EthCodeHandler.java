@@ -1,6 +1,5 @@
 package io.blockfence.handler;
 
-import am.ik.yavi.core.ConstraintViolations;
 import am.ik.yavi.core.ViolationDetail;
 import io.blockfence.data.AddressesDTO;
 import io.blockfence.data.AddressesError;
@@ -15,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static am.ik.yavi.core.ConstraintViolations.of;
 import static org.springframework.web.reactive.function.server.ServerResponse.badRequest;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
@@ -38,13 +38,18 @@ public class EthCodeHandler {
                         .applicative()
                         .validate(addressesDTO)
                         .map(ethCodeUseCaseService::generateContractCodeForAddressList)
-                        .mapErrors(violations -> ConstraintViolations.of(violations).details())
+                        .mapErrors(violations -> of(violations).details())
                         .fold(this::buildErrorResponse, contractsCodes -> ok().body(contractsCodes, ContractsCodes.class)));
     }
 
     @NotNull
     public Mono<ServerResponse> getEthDataByAddress(ServerRequest request) {
-        return ok().body(ethCodeUseCaseService.generateContractCodeForAddress(request.queryParam(ADDRESS)), ContractsCodes.class);
+        return request.queryParam(ADDRESS)
+                .map(address -> addressesDTOValidator.getAddressValidator().applicative().validate(address)
+                        .map(ethCodeUseCaseService::getContractsCodesMono)
+                        .mapErrors(violations -> of(violations).details())
+                        .fold(this::buildErrorResponse, contractsCodes -> ok().body(contractsCodes, ContractsCodes.class)))
+                .orElseGet(() -> badRequest().bodyValue(new AddressesError("Eth addresses parameter not found", List.of())));
     }
 
     @NotNull
