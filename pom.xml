@@ -27,6 +27,7 @@
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
@@ -46,6 +47,7 @@
             <version>${springdoc.version}</version>
         </dependency>
 
+        <!--non-spring section-->
         <dependency>
             <groupId>org.web3j</groupId>
             <artifactId>core</artifactId>
@@ -58,6 +60,7 @@
             <version>${yavi.version}</version>
         </dependency>
 
+        <!--runtime only section-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -69,6 +72,8 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!--test section-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -85,6 +90,7 @@
             <version>${blockhound-junit-platform.version}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
