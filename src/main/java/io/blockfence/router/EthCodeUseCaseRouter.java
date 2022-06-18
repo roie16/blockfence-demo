@@ -1,4 +1,4 @@
-package io.blockfence.controller;
+package io.blockfence.router;
 
 import io.blockfence.data.AddressesDTO;
 import io.blockfence.data.AddressesError;
@@ -43,7 +43,7 @@ public class EthCodeUseCaseRouter {
     }
 
     @RouterOperations({
-            @RouterOperation(path = V1 + ETH + CONTRACT_RAW_DATA,
+            @RouterOperation(path = V1 + ETH + CONTRACT_RAW_DATA, beanClass = EthCodeHandler.class, beanMethod = "getMultipleDataByAddressListBody",
                     produces = APPLICATION_JSON_VALUE, method = POST,
                     operation = @Operation(operationId = "generateContractCodeForAddressList",
                             responses = {
@@ -53,7 +53,7 @@ public class EthCodeUseCaseRouter {
                                             content = @Content(schema = @Schema(implementation = AddressesError.class)))},
                             requestBody = @RequestBody(required = true, description = "Get multiple addresses",
                                     content = @Content(schema = @Schema(implementation = AddressesDTO.class))))),
-            @RouterOperation(path = V1 + ETH + CONTRACT_RAW_DATA,
+            @RouterOperation(path = V1 + ETH + CONTRACT_RAW_DATA, beanClass = EthCodeHandler.class, beanMethod = "getEthDataByAddress",
                     produces = APPLICATION_JSON_VALUE, method = GET,
                     operation = @Operation(operationId = "generateContractCodeForAddress",
                             responses = {
@@ -62,7 +62,7 @@ public class EthCodeUseCaseRouter {
                                     @ApiResponse(responseCode = "400", description = "Invalid Eth address",
                                             content = @Content(schema = @Schema(implementation = AddressesError.class)))},
                             parameters = {@Parameter(in = QUERY, name = "address")})),
-            @RouterOperation(path = V1 + ETH + VERSION,
+            @RouterOperation(path = V1 + ETH + VERSION, beanClass = EthCodeHandler.class, beanMethod = "getClientVersion",
                     produces = APPLICATION_JSON_VALUE, method = GET, operation = @Operation(operationId = "getClientVersion",
                     responses = {
                             @ApiResponse(responseCode = "200", description = "successful operation",
