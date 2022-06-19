@@ -3,7 +3,7 @@ package io.blockfence.service.EthOpcodeDecompiler;
 import io.blockfence.data.ContractOpcodes;
 import io.blockfence.service.EthOpcodeDecompiler.iterators.StringTwoCharIterator;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -15,13 +15,14 @@ import static io.blockfence.service.EthOpcodeDecompiler.Opcodes.UNKNOWN;
 import static io.blockfence.service.EthOpcodeDecompiler.Opcodes.getOpcode;
 import static io.netty.util.internal.StringUtil.EMPTY_STRING;
 import static java.lang.Integer.valueOf;
+import static java.util.Objects.requireNonNullElse;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Stream.iterate;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
-@Component
+@Service
 @Slf4j
-public class EthByteCodeDisassembler {
+public class EthByteCodeDisassemblerService {
 
     private static final String CONTRACT_METADATA_PREFIX = "a165627a7a72305820"; // 0xa1 0x65 'b' 'z' 'z' 'r' '0' 0x58 0x20 + <32 bytes swarm hash> <2 bytes length of the metadata>
     private static final int BEGIN_INDEX = 2;
@@ -29,6 +30,7 @@ public class EthByteCodeDisassembler {
     private static final String PREFIX = "0x";
 
     public ContractOpcodes buildContractOpcodesFromByteCode(String byteCodeString) {
+        byteCodeString = requireNonNullElse(byteCodeString, EMPTY_STRING);
         ContractOpcodes.ContractOpcodesBuilder builder = ContractOpcodes.builder();
         String[] codeStripped = cleanData(byteCodeString);
         if (codeStripped.length > 1) {
@@ -50,7 +52,7 @@ public class EthByteCodeDisassembler {
         AtomicInteger index = new AtomicInteger(0);
         iterate(iterator, Iterator::hasNext, identity())
                 .map(StringTwoCharIterator::next)
-                .forEach(nextBytes -> index.set(handleNextByes(index, nextBytes, disassembledCodes, iterator)));
+                .forEach(nextBytes -> handleNextByes(index, nextBytes, disassembledCodes, iterator));
         return disassembledCodes;
     }
 
@@ -87,12 +89,12 @@ public class EthByteCodeDisassembler {
         }
     }
 
-    private String getParameter(int parametersNum, StringTwoCharIterator iterator) {
+    private String getParameter(int parameterSize, StringTwoCharIterator iterator) {
         StringBuilder stringBuilder = new StringBuilder(PREFIX);
-        AtomicInteger index = new AtomicInteger(0);
-        iterate(iterator, stringTwoCharIterator -> isParameter(parametersNum, index, stringTwoCharIterator), identity())
+        AtomicInteger parameterIndex = new AtomicInteger(0);
+        iterate(iterator, stringTwoCharIterator -> isParameter(parameterSize, parameterIndex, stringTwoCharIterator), identity())
                 .map(StringTwoCharIterator::next)
-                .forEach(nextString -> appendToParameterString(stringBuilder, index, nextString));
+                .forEach(nextString -> appendToParameterString(stringBuilder, parameterIndex, nextString));
         return stringBuilder.toString();
     }
 
@@ -101,7 +103,7 @@ public class EthByteCodeDisassembler {
         index.incrementAndGet();
     }
 
-    private boolean isParameter(int parametersNum, AtomicInteger index, StringTwoCharIterator stringTwoCharIterator) {
-        return stringTwoCharIterator.hasNext() && index.get() < parametersNum;
+    private boolean isParameter(int parameterSize, AtomicInteger index, StringTwoCharIterator stringTwoCharIterator) {
+        return stringTwoCharIterator.hasNext() && index.get() < parameterSize;
     }
 }

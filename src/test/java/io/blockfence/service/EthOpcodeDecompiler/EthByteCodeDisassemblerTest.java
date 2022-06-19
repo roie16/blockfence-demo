@@ -22,7 +22,7 @@ class EthByteCodeDisassemblerTest {
     public static final String SIMPLE_STRING = "0x600035601c52";
 
     @InjectMocks
-    private EthByteCodeDisassembler ethByteCodeDisassembler;
+    private EthByteCodeDisassemblerService ethByteCodeDisassemblerService;
 
     private final ClassLoader classLoader = getClass().getClassLoader();
 
@@ -30,7 +30,7 @@ class EthByteCodeDisassemblerTest {
     @Test
     void buildSimpleContractOpcodesFromByteCode() throws IOException {
         ContractOpcodes expected = readContractOpcodesFromResource("contractOpcodes/SimpleContractOpcodes.json");
-        ContractOpcodes contractOpcodes = ethByteCodeDisassembler.buildContractOpcodesFromByteCode(SIMPLE_STRING);
+        ContractOpcodes contractOpcodes = ethByteCodeDisassemblerService.buildContractOpcodesFromByteCode(SIMPLE_STRING);
         assertEquals(expected, contractOpcodes);
     }
 
@@ -39,7 +39,7 @@ class EthByteCodeDisassemblerTest {
     void buildContractOpcodesFromByteCodeMetadata() throws IOException, URISyntaxException {
         ContractOpcodes expected = readContractOpcodesFromResource("contractOpcodes/metadata/metadata.json");
         String byteCode = Files.readString(Path.of(requireNonNull(classLoader.getResource("contractOpcodes/metadata/byteCode")).toURI()));
-        ContractOpcodes contractOpcodes = ethByteCodeDisassembler.buildContractOpcodesFromByteCode(byteCode);
+        ContractOpcodes contractOpcodes = ethByteCodeDisassemblerService.buildContractOpcodesFromByteCode(byteCode);
         assertEquals(expected, contractOpcodes);
     }
 
@@ -47,7 +47,7 @@ class EthByteCodeDisassemblerTest {
     void buildContractOpcodesFromByteCodeNoMetadata() throws IOException, URISyntaxException {
         ContractOpcodes expected = readContractOpcodesFromResource("contractOpcodes/no_metadata/metadata.json");
         String byteCode = Files.readString(Path.of(requireNonNull(classLoader.getResource("contractOpcodes/no_metadata/byteCode")).toURI()));
-        ContractOpcodes contractOpcodes = ethByteCodeDisassembler.buildContractOpcodesFromByteCode(byteCode);
+        ContractOpcodes contractOpcodes = ethByteCodeDisassemblerService.buildContractOpcodesFromByteCode(byteCode);
         assertEquals(expected, contractOpcodes);
     }
 

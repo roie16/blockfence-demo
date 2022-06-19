@@ -3,7 +3,7 @@ package io.blockfence.service;
 import io.blockfence.data.AddressesDTO;
 import io.blockfence.data.ContractOpcodes;
 import io.blockfence.data.ContractsCodes;
-import io.blockfence.service.EthOpcodeDecompiler.EthByteCodeDisassembler;
+import io.blockfence.service.EthOpcodeDecompiler.EthByteCodeDisassemblerService;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.Ethereum;
@@ -21,11 +21,11 @@ import static reactor.core.scheduler.Schedulers.boundedElastic;
 public class EthCodeUseCaseService {
 
     private final Ethereum web3j;
-    private final EthByteCodeDisassembler ethByteCodeDisassembler;
+    private final EthByteCodeDisassemblerService ethByteCodeDisassemblerService;
 
-    public EthCodeUseCaseService(Ethereum web3j, EthByteCodeDisassembler ethByteCodeDisassembler) {
+    public EthCodeUseCaseService(Ethereum web3j, EthByteCodeDisassemblerService ethByteCodeDisassemblerService) {
         this.web3j = web3j;
-        this.ethByteCodeDisassembler = ethByteCodeDisassembler;
+        this.ethByteCodeDisassemblerService = ethByteCodeDisassemblerService;
     }
 
 
@@ -49,7 +49,7 @@ public class EthCodeUseCaseService {
     private ContractsCodes getEthGetCodeByAddress(String address) {
         try {
             EthGetCode ethGetCode = web3j.ethGetCode(address, DefaultBlockParameterName.LATEST).send();
-            ContractOpcodes contractOpcodes = ethByteCodeDisassembler.buildContractOpcodesFromByteCode(ethGetCode.getCode());
+            ContractOpcodes contractOpcodes = ethByteCodeDisassemblerService.buildContractOpcodesFromByteCode(ethGetCode.getCode());
             return new ContractsCodes(ethGetCode.getCode(), contractOpcodes);
         } catch (IOException e) {
             throw new RuntimeException(e);
