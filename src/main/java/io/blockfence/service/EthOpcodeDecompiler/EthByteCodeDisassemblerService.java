@@ -56,13 +56,13 @@ public class EthByteCodeDisassemblerService {
         return disassembledCodes;
     }
 
-    private int handleNextByes(AtomicInteger index, String nextByte, List<String> disassembledCodes, StringTwoCharIterator iterator) {
+    private void handleNextByes(AtomicInteger index, String nextByte, List<String> disassembledCodes, StringTwoCharIterator iterator) {
         Opcode opcode = new Opcode();
         opcode.setOffset(index.get());
         Integer opcodeHex = valueOf(nextByte, RADIX);
         getOpcode(opcodeHex).ifPresentOrElse(opcodes -> doOnOpcode(index, iterator, opcode, opcodes), () -> doOnEmptyOpcode(opcode, opcodeHex));
         disassembledCodes.add(opcode.toString());
-        return index.incrementAndGet();
+        index.incrementAndGet();
     }
 
     private void doOnOpcode(AtomicInteger index, StringTwoCharIterator iterator, Opcode opcode, Opcodes opcodes) {
