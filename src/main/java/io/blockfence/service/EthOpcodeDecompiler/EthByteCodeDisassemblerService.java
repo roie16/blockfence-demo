@@ -57,35 +57,35 @@ public class EthByteCodeDisassemblerService {
     }
 
     private void handleNextByes(AtomicInteger index, String nextByte, List<String> disassembledCodes, StringTwoCharIterator iterator) {
-        Opcode opcode = new Opcode();
-        opcode.setOffset(index.get());
+        Instruction instruction = new Instruction();
+        instruction.setOffset(index.get());
         Integer opcodeHex = valueOf(nextByte, RADIX);
-        getOpcode(opcodeHex).ifPresentOrElse(opcodes -> doOnOpcode(index, iterator, opcode, opcodes), () -> doOnEmptyOpcode(opcode, opcodeHex));
-        disassembledCodes.add(opcode.toString());
+        getOpcode(opcodeHex).ifPresentOrElse(opcodes -> doOnOpcode(index, iterator, instruction, opcodes), () -> doOnEmptyOpcode(instruction, opcodeHex));
+        disassembledCodes.add(instruction.toString());
         index.incrementAndGet();
     }
 
-    private void doOnOpcode(AtomicInteger index, StringTwoCharIterator iterator, Opcode opcode, Opcodes opcodes) {
-        opcode.setOpcode(opcodes);
+    private void doOnOpcode(AtomicInteger index, StringTwoCharIterator iterator, Instruction instruction, Opcodes opcodes) {
+        instruction.setOpcode(opcodes);
         int parametersNum = opcodes.getParametersNum();
         if (parametersNum > 0) {
             index.addAndGet(parametersNum);
             String opParameter = getParameter(parametersNum, iterator);
             String parameterString = opParameter.replaceAll(PREFIX, EMPTY_STRING);
-            addParameterIfNotEmpty(opcode, parameterString);
+            addParameterIfNotEmpty(instruction, parameterString);
         }
     }
 
-    private void doOnEmptyOpcode(Opcode opcode, Integer opcodeHex) {
+    private void doOnEmptyOpcode(Instruction instruction, Integer opcodeHex) {
         log.warn("Unknown opcode: " + opcodeHex);
-        opcode.setOpcode(UNKNOWN);
+        instruction.setOpcode(UNKNOWN);
     }
 
-    private void addParameterIfNotEmpty(Opcode opcode, String parameterString) {
+    private void addParameterIfNotEmpty(Instruction instruction, String parameterString) {
         if (isEmpty(parameterString)) {
-            opcode.setOpcode(UNKNOWN);
+            instruction.setOpcode(UNKNOWN);
         } else {
-            opcode.setParameter(new BigInteger(parameterString, RADIX));
+            instruction.setParameter(new BigInteger(parameterString, RADIX));
         }
     }
 

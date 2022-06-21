@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContractsCodes {
+public class Contract {
+    private String address;
     private String byteCode;
     private ContractOpcodes contractOpcodes;
 }

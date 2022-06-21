@@ -3,7 +3,7 @@ package io.blockfence.handler;
 import am.ik.yavi.core.ViolationDetail;
 import io.blockfence.data.AddressesDTO;
 import io.blockfence.data.AddressesError;
-import io.blockfence.data.ContractsCodes;
+import io.blockfence.data.Contract;
 import io.blockfence.handler.validator.AddressesDTOValidator;
 import io.blockfence.service.EthCodeUseCaseService;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +39,7 @@ public class EthCodeHandler {
                         .validate(addressesDTO)
                         .map(ethCodeUseCaseService::generateContractCodeForAddressList)
                         .mapErrors(violations -> of(violations).details())
-                        .fold(this::buildErrorResponse, contractsCodes -> ok().body(contractsCodes, ContractsCodes.class)));
+                        .fold(this::buildErrorResponse, contractsCodes -> ok().body(contractsCodes, Contract.class)));
     }
 
     @NotNull
@@ -50,7 +50,7 @@ public class EthCodeHandler {
                         .validate(address)
                         .map(ethCodeUseCaseService::getContractsCodesMono)
                         .mapErrors(violations -> of(violations).details())
-                        .fold(this::buildErrorResponse, contractsCodes -> ok().body(contractsCodes, ContractsCodes.class)))
+                        .fold(this::buildErrorResponse, contractsCodes -> ok().body(contractsCodes, Contract.class)))
                 .orElseGet(() -> badRequest().bodyValue(new AddressesError("address query parameter not found", List.of())));
     }
 

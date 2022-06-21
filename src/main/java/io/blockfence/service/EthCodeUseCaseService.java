@@ -1,8 +1,8 @@
 package io.blockfence.service;
 
 import io.blockfence.data.AddressesDTO;
+import io.blockfence.data.Contract;
 import io.blockfence.data.ContractOpcodes;
-import io.blockfence.data.ContractsCodes;
 import io.blockfence.service.EthOpcodeDecompiler.EthByteCodeDisassemblerService;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -29,13 +29,13 @@ public class EthCodeUseCaseService {
     }
 
 
-    public Flux<ContractsCodes> generateContractCodeForAddressList(AddressesDTO addressesDTO) {
+    public Flux<Contract> generateContractCodeForAddressList(AddressesDTO addressesDTO) {
         return fromIterable(addressesDTO.getAddresses())
                 .map(this::getEthGetCodeByAddress)
                 .subscribeOn(boundedElastic());
     }
 
-    public Mono<ContractsCodes> getContractsCodesMono(String address) {
+    public Mono<Contract> getContractsCodesMono(String address) {
         return fromCallable(() -> getEthGetCodeByAddress(address))
                 .subscribeOn(boundedElastic());
     }
@@ -46,11 +46,11 @@ public class EthCodeUseCaseService {
                 .subscribeOn(boundedElastic());
     }
 
-    private ContractsCodes getEthGetCodeByAddress(String address) {
+    private Contract getEthGetCodeByAddress(String address) {
         try {
             EthGetCode ethGetCode = web3j.ethGetCode(address, DefaultBlockParameterName.LATEST).send();
             ContractOpcodes contractOpcodes = ethByteCodeDisassemblerService.buildContractOpcodesFromByteCode(ethGetCode.getCode());
-            return new ContractsCodes(ethGetCode.getCode(), contractOpcodes);
+            return new Contract(address, ethGetCode.getCode(), contractOpcodes);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

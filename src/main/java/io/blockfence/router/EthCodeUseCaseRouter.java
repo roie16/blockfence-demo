@@ -2,7 +2,7 @@ package io.blockfence.router;
 
 import io.blockfence.data.AddressesDTO;
 import io.blockfence.data.AddressesError;
-import io.blockfence.data.ContractsCodes;
+import io.blockfence.data.Contract;
 import io.blockfence.handler.EthCodeHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,7 +48,7 @@ public class EthCodeUseCaseRouter {
                     operation = @Operation(operationId = "generateContractCodeForAddressList",
                             responses = {
                                     @ApiResponse(responseCode = "200", description = "successful operation",
-                                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContractsCodes.class)))),
+                                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Contract.class)))),
                                     @ApiResponse(responseCode = "400", description = "Invalid Eth address",
                                             content = @Content(schema = @Schema(implementation = AddressesError.class)))},
                             requestBody = @RequestBody(required = true, description = "Get multiple addresses",
@@ -58,7 +58,7 @@ public class EthCodeUseCaseRouter {
                     operation = @Operation(operationId = "generateContractCodeForAddress",
                             responses = {
                                     @ApiResponse(responseCode = "200", description = "successful operation",
-                                            content = @Content(schema = @Schema(implementation = ContractsCodes.class))),
+                                            content = @Content(schema = @Schema(implementation = Contract.class))),
                                     @ApiResponse(responseCode = "400", description = "Invalid Eth address",
                                             content = @Content(schema = @Schema(implementation = AddressesError.class)))},
                             parameters = {@Parameter(in = QUERY, name = "address")})),

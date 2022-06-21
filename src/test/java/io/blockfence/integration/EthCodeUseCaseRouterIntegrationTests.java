@@ -3,7 +3,7 @@ package io.blockfence.integration;
 
 import io.blockfence.data.AddressesDTO;
 import io.blockfence.data.AddressesError;
-import io.blockfence.data.ContractsCodes;
+import io.blockfence.data.Contract;
 import io.blockfence.router.EthCodeUseCaseRouter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,11 +41,12 @@ public class EthCodeUseCaseRouterIntegrationTests {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(ContractsCodes.class)
+                .expectBody(Contract.class)
                 .consumeWith(serverResponse -> {
                     assertNotNull(serverResponse.getResponseBody());
                     assertFalse(serverResponse.getResponseBody().getContractOpcodes().getDisassembledCode().isEmpty());
                     assertFalse(serverResponse.getResponseBody().getByteCode().isBlank());
+                    assertFalse(serverResponse.getResponseBody().getAddress().isBlank());
                 });
     }
 
@@ -62,10 +63,11 @@ public class EthCodeUseCaseRouterIntegrationTests {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(ContractsCodes.class)
+                .expectBodyList(Contract.class)
                 .consumeWith(serverResponse -> {
                     assertNotNull(serverResponse.getResponseBody());
                     assertFalse(serverResponse.getResponseBody().get(0).getByteCode().isBlank());
+                    assertFalse(serverResponse.getResponseBody().get(0).getAddress().isBlank());
                 });
     }
 

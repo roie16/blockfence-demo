@@ -7,7 +7,7 @@ import java.math.BigInteger;
 import static java.lang.String.format;
 
 @Data
-public class Opcode {
+public class Instruction {
 
     private int offset;
     private Opcodes opcode;
