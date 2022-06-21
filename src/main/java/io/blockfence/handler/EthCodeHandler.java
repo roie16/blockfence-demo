@@ -45,7 +45,9 @@ public class EthCodeHandler {
     @NotNull
     public Mono<ServerResponse> getEthDataByAddress(ServerRequest request) {
         return request.queryParam(ADDRESS)
-                .map(address -> addressesDTOValidator.getAddressValidator().applicative().validate(address)
+                .map(address -> addressesDTOValidator.getAddressValidator()
+                        .applicative()
+                        .validate(address)
                         .map(ethCodeUseCaseService::getContractsCodesMono)
                         .mapErrors(violations -> of(violations).details())
                         .fold(this::buildErrorResponse, contractsCodes -> ok().body(contractsCodes, ContractsCodes.class)))
