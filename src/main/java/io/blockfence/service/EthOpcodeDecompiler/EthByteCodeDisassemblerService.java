@@ -70,7 +70,7 @@ public class EthByteCodeDisassemblerService {
         int parametersNum = opcodes.getParametersNum();
         if (parametersNum > 0) {
             index.addAndGet(parametersNum);
-            String opParameter = getParameter(parametersNum, iterator);
+            String opParameter = buildParameter(parametersNum, iterator);
             String parameterString = opParameter.replaceAll(PREFIX, EMPTY_STRING);
             addParameterIfNotEmpty(instruction, parameterString);
         }
@@ -89,7 +89,7 @@ public class EthByteCodeDisassemblerService {
         }
     }
 
-    private String getParameter(int parameterSize, StringTwoCharIterator iterator) {
+    private String buildParameter(int parameterSize, StringTwoCharIterator iterator) {
         StringBuilder stringBuilder = new StringBuilder(PREFIX);
         AtomicInteger parameterIndex = new AtomicInteger(0);
         iterate(iterator, stringTwoCharIterator -> isParameter(parameterSize, parameterIndex, stringTwoCharIterator), identity())

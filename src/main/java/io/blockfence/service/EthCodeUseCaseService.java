@@ -42,7 +42,7 @@ public class EthCodeUseCaseService {
 
     public Mono<String> getClientVersion() {
         return fromCallable(() -> web3j.web3ClientVersion().send())
-                .map(web3ClientVersion -> "Client version" + web3ClientVersion)
+                .map(web3ClientVersion -> "client version: " + web3ClientVersion)
                 .subscribeOn(boundedElastic());
     }
 

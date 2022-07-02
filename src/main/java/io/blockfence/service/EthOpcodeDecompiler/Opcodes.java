@@ -150,22 +150,22 @@ public enum Opcodes {
     INVALID(0xfe, 0),
     SELFDESTRUCT(0xff, 0);
 
-    private final int opcode;
-    private final int parametersNum;
-
     private static final Map<Integer, Opcodes> opcodes = new HashMap<>();
 
     static {
         stream(values()).forEach(opcode -> opcodes.put(opcode.getOpcode(), opcode));
     }
 
+    public static Optional<Opcodes> getOpcode(Integer hex) {
+        return ofNullable(opcodes.get(hex));
+    }
+
+    private final int opcode;
+    private final int parametersNum;
+
     Opcodes(int opcode, int paramsNum) {
         this.opcode = opcode;
         this.parametersNum = paramsNum;
-    }
-
-    public static Optional<Opcodes> getOpcode(Integer hex) {
-        return ofNullable(opcodes.get(hex));
     }
 
     public int getParametersNum() {
@@ -175,5 +175,4 @@ public enum Opcodes {
     private int getOpcode() {
         return opcode;
     }
-
 }
