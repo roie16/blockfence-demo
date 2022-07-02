@@ -9,7 +9,7 @@ import org.web3j.protocol.http.HttpService;
 import static org.web3j.protocol.Web3j.build;
 
 @Configuration
-public class Web3jConfiguraion {
+public class Web3jConfiguration {
 
     @Value("${blockfence.infura.mainnet.url}")
     private String url;
