@@ -31,6 +31,7 @@ public class EthCodeUseCaseService {
 
     public Flux<Contract> generateContractCodeForAddressList(AddressesDTO addressesDTO) {
         return fromIterable(addressesDTO.getAddresses())
+                .distinct()
                 .map(this::getEthGetCodeByAddress)
                 .subscribeOn(boundedElastic());
     }

@@ -13,8 +13,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @SpringBootTest
@@ -58,7 +57,7 @@ public class EthCodeUseCaseRouterIntegrationTests {
                 .build()
                 .post()
                 .uri(V_1_ETH_CONTRACTRAWDATA)
-                .bodyValue(validRequestBody())
+                .bodyValue(validRequestBody(ADDRESS, ADDRESS_2))
                 .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -70,6 +69,29 @@ public class EthCodeUseCaseRouterIntegrationTests {
                     assertFalse(serverResponse.getResponseBody().get(0).getAddress().isBlank());
                 });
     }
+
+    @Test
+    @DisplayName("Test contractrawdata POST request multiple(same address)")
+    public void validPostRequestIntegrationTestMultipleAddresses() {
+        WebTestClient
+                .bindToRouterFunction(ethCodeUseCaseRouter.EthCodeUseCaseRoutes())
+                .build()
+                .post()
+                .uri(V_1_ETH_CONTRACTRAWDATA)
+                .bodyValue(validRequestBody(ADDRESS, ADDRESS_2, ADDRESS))
+                .accept(APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(Contract.class)
+                .consumeWith(serverResponse -> {
+                    assertNotNull(serverResponse.getResponseBody());
+                    assertEquals(2, serverResponse.getResponseBody().size());
+                    assertFalse(serverResponse.getResponseBody().get(0).getByteCode().isBlank());
+                    assertFalse(serverResponse.getResponseBody().get(0).getAddress().isBlank());
+                });
+    }
+
 
     @Test
     @DisplayName("Test contractrawdata GET invalid address request")
@@ -129,9 +151,9 @@ public class EthCodeUseCaseRouterIntegrationTests {
                 });
     }
 
-    private AddressesDTO validRequestBody() {
+    private AddressesDTO validRequestBody(String... addresses) {
         AddressesDTO addressesDTO = new AddressesDTO();
-        addressesDTO.setAddresses(List.of(ADDRESS, ADDRESS_2));
+        addressesDTO.setAddresses(List.of(addresses));
         return addressesDTO;
     }
 
